@@ -1,3 +1,5 @@
+const fetch = require('node-fetch');
+
 // This is your new "middleman" serverless function.
 // When you deploy this to a host like Netlify, it will run in a secure environment.
 
@@ -26,6 +28,9 @@ exports.handler = async function (event, context) {
         // For Netlify, this is found in Site settings > Build & deploy > Environment > Environment variables.
         // Name the variable 'GEMINI_API_KEY'.
         const apiKey = process.env.GEMINI_API_KEY;
+        if (!apiKey) {
+            throw new Error('GEMINI_API_KEY is not set in environment variables.');
+        }
         const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-05-20:generateContent?key=${apiKey}`;
 
         const groundedQuery = `site:jw.org ${userMessage}`;
@@ -46,6 +51,8 @@ exports.handler = async function (event, context) {
 
         if (!response.ok) {
             console.error(`API call failed with status: ${response.status}`);
+            const errorBody = await response.text();
+            console.error(`Error body: ${errorBody}`);
             return { statusCode: response.status, body: 'Error from Gemini API' };
         }
 
@@ -86,3 +93,4 @@ exports.handler = async function (event, context) {
         };
     }
 };
+
