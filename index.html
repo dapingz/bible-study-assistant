@@ -1,0 +1,357 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bible Study Assistant - Prototype</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        /* Simple scrollbar styling for a cleaner look */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #f1f5f9;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #94a3b8;
+            border-radius: 10px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #64748b;
+        }
+        .assistant-bubble, .user-bubble {
+            animation: fadeIn 0.5s ease-in-out;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        /* Typing indicator animation */
+        .typing-indicator span {
+            height: 8px;
+            width: 8px;
+            background-color: #94a3b8;
+            border-radius: 50%;
+            display: inline-block;
+            animation: bounce 1.4s infinite ease-in-out both;
+        }
+        .typing-indicator span:nth-child(1) { animation-delay: -0.32s; }
+        .typing-indicator span:nth-child(2) { animation-delay: -0.16s; }
+        @keyframes bounce {
+            0%, 80%, 100% { transform: scale(0); }
+            40% { transform: scale(1.0); }
+        }
+    </style>
+</head>
+<body class="bg-slate-100 text-slate-800 flex items-center justify-center min-h-screen">
+
+    <div id="app-container" class="w-full max-w-md mx-auto bg-white rounded-2xl shadow-2xl h-[80vh] flex flex-col transition-all duration-500">
+
+        <!-- Welcome Screen -->
+        <div id="welcome-screen" class="flex flex-col items-center justify-center text-center p-8 h-full">
+            <div class="mb-6">
+                <svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-blue-500 mx-auto"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"></path><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"></path></svg>
+            </div>
+            <h1 class="text-3xl font-bold text-slate-900 mb-2">Bible Study Assistant</h1>
+            <p class="text-slate-500 mb-8">A friendly guide for your personal study.</p>
+            
+            <div class="space-y-4 w-full">
+                <button onclick="startStudy('course')" class="w-full bg-blue-500 hover:bg-blue-600 text-white font-semibold py-3 px-4 rounded-xl shadow-md transition-transform transform hover:scale-105 flex items-center justify-center">
+                    <span class="mr-3">
+                        <!-- Two people studying SVG -->
+                        <svg width="50" height="50" viewBox="0 0 120 120">
+                            <defs>
+                                <clipPath id="circleClip1"><circle cx="40" cy="35" r="18"/></clipPath>
+                                <clipPath id="circleClip2"><circle cx="80" cy="45" r="18"/></clipPath>
+                            </defs>
+                            <!-- Table -->
+                            <rect x="10" y="90" width="100" height="15" fill="#A0522D" rx="5"/>
+                            <!-- Person 1 (Tutor) -->
+                            <rect x="22" y="50" width="36" height="40" fill="#2F4F4F" rx="10"/>
+                            <circle cx="40" cy="35" r="18" fill="#F5DEB3"/>
+                            <g clip-path="url(#circleClip1)">
+                                <path d="M30,25 Q40,20 50,25" stroke="#444" stroke-width="3" fill="none"/>
+                                <circle cx="34" cy="35" r="2" fill="#333"/>
+                                <circle cx="46" cy="35" r="2" fill="#333"/>
+                                <path d="M38,42 Q40,45 42,42" stroke="#333" stroke-width="2" fill="none"/>
+                            </g>
+                            <!-- Person 2 (Student) -->
+                            <rect x="62" y="60" width="36" height="30" fill="#4682B4" rx="10"/>
+                            <circle cx="80" cy="45" r="18" fill="#A0522D"/>
+                             <g clip-path="url(#circleClip2)">
+                                <path d="M70,35 Q80,30 90,35" stroke="#222" stroke-width="3" fill="none"/>
+                                <circle cx="74" cy="45" r="2" fill="#000"/>
+                                <circle cx="86" cy="45" r="2" fill="#000"/>
+                                <path d="M78,52 Q80,56 82,52" stroke="#000" stroke-width="2" fill="none"/>
+                            </g>
+                             <!-- Book -->
+                            <path d="M50,80 L70,75 L75,90 L55,95 Z" fill="#FFFFFF" stroke="#DDD" stroke-width="2"/>
+                            <path d="M70,75 L90,80 L85,95 L65,90 Z" fill="#FFFFFF" stroke="#DDD" stroke-width="2"/>
+                        </svg>
+                    </span>
+                    Start the Interactive Bible Course
+                </button>
+
+                <button onclick="startStudy('explore')" class="w-full bg-slate-200 hover:bg-slate-300 text-slate-800 font-semibold py-3 px-4 rounded-xl transition-transform transform hover:scale-105 flex items-center justify-center">
+                    <span class="mr-3">
+                        <!-- Couple SVG -->
+                        <svg width="50" height="50" viewBox="0 0 120 120">
+                            <defs>
+                                <clipPath id="circleClip3"><circle cx="45" cy="40" r="15"/></clipPath>
+                                <clipPath id="circleClip4"><circle cx="75" cy="40" r="15"/></clipPath>
+                            </defs>
+                            <!-- Woman -->
+                            <rect x="60" y="55" width="30" height="45" fill="#800080" rx="10"/>
+                            <circle cx="75" cy="40" r="15" fill="#D2B48C"/>
+                             <g clip-path="url(#circleClip4)">
+                                <path d="M65,30 Q85,25 85,35" stroke="#333" stroke-width="3" fill="none"/>
+                                <circle cx="70" cy="40" r="2" fill="#222"/>
+                                <circle cx="80" cy="40" r="2" fill="#222"/>
+                                <path d="M72,48 Q75,52 78,48" stroke="#222" stroke-width="2" fill="none"/>
+                            </g>
+                            <!-- Man -->
+                            <rect x="30" y="55" width="30" height="55" fill="#2F4F4F" rx="10"/>
+                            <path d="M42,55 L45,65 L48,55 Z" fill="#FFF"/>
+                            <circle cx="45" cy="40" r="15" fill="#8B4513"/>
+                            <g clip-path="url(#circleClip3)">
+                                <path d="M38,30 Q45,28 52,30" stroke="#111" stroke-width="3" fill="none"/>
+                                <circle cx="40" cy="40" r="2" fill="#000"/>
+                                <circle cx="50" cy="40" r="2" fill="#000"/>
+                                <path d="M42,48 Q45,52 48,48" stroke="#000" stroke-width="2" fill="none"/>
+                            </g>
+                        </svg>
+                    </span>
+                    Explore a Topic or Ask a Question
+                </button>
+
+                <button onclick="startStudy('children')" class="w-full bg-orange-500 hover:bg-orange-600 text-white font-semibold py-3 px-4 rounded-xl shadow-md transition-transform transform hover:scale-105 flex items-center justify-center">
+                    <span class="mr-3">
+                        <!-- Two happy children SVG -->
+                        <svg width="50" height="50" viewBox="0 0 120 120">
+                            <defs>
+                                <clipPath id="circleClip5"><circle cx="40" cy="45" r="15"/></clipPath>
+                                <clipPath id="circleClip6"><circle cx="80" cy="45" r="15"/></clipPath>
+                            </defs>
+                             <!-- Girl -->
+                            <rect x="65" y="60" width="30" height="40" fill="#FF69B4" rx="10"/>
+                            <circle cx="80" cy="45" r="15" fill="#A0522D"/>
+                            <g clip-path="url(#circleClip6)">
+                                <path d="M70,35 Q75,32 80,35" stroke="#222" stroke-width="3" fill="none"/>
+                                <path d="M80,35 Q85,32 90,35" stroke="#222" stroke-width="3" fill="none"/>
+                                <circle cx="75" cy="45" r="2.5" fill="#000"/>
+                                <circle cx="85" cy="45" r="2.5" fill="#000"/>
+                                <path d="M77,53 Q80,58 83,53" stroke="#000" stroke-width="2" fill="none"/>
+                            </g>
+                            <!-- Boy -->
+                            <rect x="25" y="60" width="30" height="40" fill="#32CD32" rx="10"/>
+                            <circle cx="40" cy="45" r="15" fill="#FFDAB9"/>
+                            <g clip-path="url(#circleClip5)">
+                                <path d="M30,35 Q40,30 50,35" stroke="#A0522D" stroke-width="3" fill="none"/>
+                                <circle cx="35" cy="45" r="2.5" fill="#333"/>
+                                <circle cx="45" cy="45" r="2.5" fill="#333"/>
+                                <path d="M37,53 Q40,58 43,53" stroke="#333" stroke-width="2" fill="none"/>
+                            </g>
+                        </svg>
+                    </span>
+                    Enter Children's Section
+                </button>
+            </div>
+        </div>
+
+        <!-- Chat Screen -->
+        <div id="chat-screen" class="hidden flex-col h-full">
+            <!-- Header -->
+            <div class="flex items-center p-4 border-b bg-slate-50 rounded-t-2xl">
+                <button onclick="goBack()" class="mr-3 text-slate-500 hover:text-slate-800">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>
+                </button>
+                <h2 id="chat-header" class="text-xl font-bold text-slate-900">Bible Study Assistant</h2>
+            </div>
+            
+            <!-- Messages Area -->
+            <div id="chat-messages" class="flex-1 p-6 overflow-y-auto space-y-6">
+                <!-- Messages will be injected here by JavaScript -->
+            </div>
+
+            <!-- Input Area -->
+            <div class="p-4 bg-slate-50 border-t rounded-b-2xl">
+                <div class="flex items-center bg-white rounded-xl border p-1">
+                    <input type="text" id="chat-input" placeholder="Type your message..." class="flex-1 px-3 py-2 bg-transparent focus:outline-none">
+                    <button id="send-button" onclick="sendMessage()" class="bg-blue-500 hover:bg-blue-600 text-white rounded-lg p-2 ml-2">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+        const welcomeScreen = document.getElementById('welcome-screen');
+        const chatScreen = document.getElementById('chat-screen');
+        const chatMessages = document.getElementById('chat-messages');
+        const chatInput = document.getElementById('chat-input');
+        const chatHeader = document.getElementById('chat-header');
+        const sendButton = document.getElementById('send-button');
+
+        // The system prompt is now stored securely in the serverless function.
+        
+        function startStudy(type) {
+            welcomeScreen.classList.add('hidden');
+            chatScreen.classList.remove('hidden');
+            chatScreen.classList.add('flex');
+            chatMessages.innerHTML = '';
+            
+            let welcomeMessage = '';
+            let headerTitle = 'Bible Study Assistant';
+
+            switch (type) {
+                case 'course':
+                    welcomeMessage = "That's wonderful that you're interested in the Bible course! I can guide you through the 'Enjoy Life Forever!' study guide. Are you ready to begin with the first lesson?";
+                    headerTitle = 'Interactive Course';
+                    addAssistantMessage(welcomeMessage);
+                    break;
+                case 'explore':
+                    welcomeMessage = "I'm here to help you explore any Bible topic you have in mind. What would you like to learn about today? You could ask about a person, a place, a Bible book, or a specific teaching.";
+                    headerTitle = 'Explore a Topic';
+                    addAssistantMessage(welcomeMessage);
+                    break;
+                case 'children':
+                    welcomeMessage = "Hello, friend! Welcome to the children's section. Would you like to watch a video, sing a song, or do a fun activity today?";
+                    headerTitle = "Children's Section";
+                    addAssistantMessage(welcomeMessage);
+                    break;
+            }
+            chatHeader.textContent = headerTitle;
+        }
+
+        function goBack() {
+            chatScreen.classList.add('hidden');
+            chatScreen.classList.remove('flex');
+            welcomeScreen.classList.remove('hidden');
+        }
+
+        function setTyping(isTyping) {
+            if (isTyping) {
+                const typingElement = document.createElement('div');
+                typingElement.id = 'typing-indicator';
+                typingElement.className = 'flex items-start gap-3 assistant-bubble';
+                typingElement.innerHTML = `
+                    <div class="bg-blue-500 text-white rounded-full p-2 flex-shrink-0">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"></path><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"></path></svg>
+                    </div>
+                    <div class="bg-slate-200 text-slate-800 rounded-xl p-3 max-w-xs">
+                        <div class="typing-indicator">
+                            <span></span><span></span><span></span>
+                        </div>
+                    </div>
+                `;
+                chatMessages.appendChild(typingElement);
+                chatMessages.scrollTop = chatMessages.scrollHeight;
+                sendButton.disabled = true;
+            } else {
+                const typingElement = document.getElementById('typing-indicator');
+                if (typingElement) {
+                    typingElement.remove();
+                }
+                sendButton.disabled = false;
+            }
+        }
+        
+        function addAssistantMessage(message, sources = []) {
+            setTyping(false);
+            const messageElement = document.createElement('div');
+            messageElement.className = 'flex items-start gap-3 assistant-bubble';
+
+            let sourcesHTML = '';
+            if (sources.length > 0) {
+                sourcesHTML = '<div class="mt-3 pt-3 border-t border-slate-300 text-xs text-slate-600">';
+                sourcesHTML += '<p class="font-semibold mb-1">References:</p><ol class="list-decimal list-inside space-y-1">';
+                sources.forEach(source => {
+                    sourcesHTML += `<li><a href="${source.uri}" target="_blank" class="text-blue-600 hover:underline">${source.title || 'jw.org'}</a></li>`;
+                });
+                sourcesHTML += '</ol></div>';
+            }
+
+            messageElement.innerHTML = `
+                <div class="bg-blue-500 text-white rounded-full p-2 flex-shrink-0">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"></path><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"></path></svg>
+                </div>
+                <div class="bg-slate-200 text-slate-800 rounded-xl p-3 max-w-xs">
+                    <p>${message.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>').replace(/\n/g, '<br>')}</p>
+                    ${sourcesHTML}
+                </div>
+            `;
+            chatMessages.appendChild(messageElement);
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+        }
+
+        function addUserMessage(message) {
+            const messageElement = document.createElement('div');
+            messageElement.className = 'flex items-start gap-3 justify-end user-bubble';
+            messageElement.innerHTML = `
+                <div class="bg-blue-500 text-white rounded-xl p-3 max-w-xs">
+                    <p>${message}</p>
+                </div>
+            `;
+            chatMessages.appendChild(messageElement);
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+        }
+
+        async function getLLMResponse(userMessage) {
+            setTyping(true);
+            
+            // The API URL now points to our new, secure serverless function.
+            // When deployed, the browser knows how to find this function at this path.
+            const apiUrl = '/.netlify/functions/get-response';
+
+            try {
+                const response = await fetch(apiUrl, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    // We just need to send the user's message.
+                    body: JSON.stringify({ userMessage: userMessage })
+                });
+
+                if (!response.ok) {
+                    throw new Error(`Serverless function failed with status: ${response.status}`);
+                }
+
+                // The serverless function sends back the data in the same format we need.
+                const result = await response.json();
+                
+                addAssistantMessage(result.text, result.sources);
+
+            } catch (error) {
+                console.error("Error fetching LLM response:", error);
+                addAssistantMessage("I'm having a little trouble connecting right now. Please try again in a moment.");
+            }
+        }
+
+        function sendMessage() {
+            const message = chatInput.value.trim();
+            if (message) {
+                addUserMessage(message);
+                chatInput.value = '';
+                getLLMResponse(message);
+            }
+        }
+
+        chatInput.addEventListener('keypress', function (e) {
+            if (e.key === 'Enter') {
+                sendMessage();
+            }
+        });
+    </script>
+
+</body>
+</html>
+
+
