@@ -31,7 +31,7 @@ exports.handler = async function (event, context) {
         if (!apiKey) {
             throw new Error('GEMINI_API_KEY is not set in environment variables.');
         }
-        const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-05-20:generateContent?key=${apiKey}`;
+        const apiUrl = `https://generativelogin.googleapis.com/v1beta/models/gemini-2.5-flash-preview-05-20:generateContent?key=${apiKey}`;
 
         const groundedQuery = `site:jw.org ${userMessage}`;
 
