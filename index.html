@@ -55,55 +55,57 @@
     <!-- App container is now wider on larger screens -->
     <div id="app-container" class="w-full max-w-md md:max-w-2xl lg:max-w-4xl mx-auto bg-white rounded-2xl shadow-2xl h-[90vh] flex flex-col transition-all duration-500">
 
-        <!-- Welcome Screen -->
-        <div id="welcome-screen" class="flex flex-col items-center justify-center text-center p-8 h-full">
-            <div class="mb-6">
-                <svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-blue-500 mx-auto"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"></path><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"></path></svg>
-            </div>
-            <h1 class="text-3xl font-bold text-slate-900 mb-2">Bible Study Assistant</h1>
-            <p class="text-slate-500 mb-8">A friendly guide for your personal study.</p>
-            
-            <div class="space-y-4 w-full max-w-sm">
-                <button onclick="startStudy('course')" class="w-full bg-blue-500 hover:bg-blue-600 text-white font-semibold py-3 px-4 rounded-xl shadow-md transition-transform transform hover:scale-105 flex items-center justify-center">
-                    Start the Interactive Bible Course
-                </button>
-
-                <button onclick="startStudy('explore')" class="w-full bg-slate-200 hover:bg-slate-300 text-slate-800 font-semibold py-3 px-4 rounded-xl transition-transform transform hover:scale-105 flex items-center justify-center">
-                    Explore a Topic or Ask a Question
-                </button>
-
-                <button onclick="startStudy('children')" class="w-full bg-orange-500 hover:bg-orange-600 text-white font-semibold py-3 px-4 rounded-xl shadow-md transition-transform transform hover:scale-105 flex items-center justify-center">
-                    Enter Children's Section
-                </button>
-            </div>
+        <!-- ===== PERSISTENT HEADER ===== -->
+        <div class="flex items-center p-4 border-b bg-slate-50 rounded-t-2xl flex-shrink-0">
+            <button id="back-button" onclick="goBack()" class="hidden mr-3 text-slate-500 hover:text-slate-800">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>
+            </button>
+            <h2 id="header-title" class="text-xl font-bold text-slate-900">Bible Study Assistant</h2>
         </div>
 
-        <!-- Chat Screen -->
-        <div id="chat-screen" class="hidden flex-col h-full">
-            <!-- Header -->
-            <div class="flex items-center p-4 border-b bg-slate-50 rounded-t-2xl">
-                <button onclick="goBack()" class="mr-3 text-slate-500 hover:text-slate-800">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>
-                </button>
-                <h2 id="chat-header" class="text-xl font-bold text-slate-900">Bible Study Assistant</h2>
-            </div>
-            
-            <!-- Messages Area -->
-            <div id="chat-messages" class="flex-1 p-6 overflow-y-auto space-y-6">
-                <!-- Messages will be injected here by JavaScript -->
-            </div>
+        <!-- ===== MAIN CONTENT AREA ===== -->
+        <div class="flex-1 relative overflow-hidden">
+            <!-- Welcome Screen -->
+            <div id="welcome-screen" class="absolute inset-0 flex flex-col items-center justify-center text-center p-8 overflow-y-auto">
+                <div class="mb-6">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-blue-500 mx-auto"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"></path><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"></path></svg>
+                </div>
+                <h1 class="text-3xl font-bold text-slate-900 mb-2">Welcome!</h1>
+                <p class="text-slate-500 mb-8">A friendly guide for your personal study.</p>
+                
+                <div class="space-y-4 w-full max-w-sm">
+                    <button onclick="startStudy('course')" class="w-full bg-blue-500 hover:bg-blue-600 text-white font-semibold py-3 px-4 rounded-xl shadow-md transition-transform transform hover:scale-105 flex items-center justify-center">
+                        Start the Interactive Bible Course
+                    </button>
 
-            <!-- Input Area -->
-            <div class="p-4 bg-slate-50 border-t rounded-b-2xl">
-                <div class="flex items-center bg-white rounded-xl border p-1">
-                    <input type="text" id="chat-input" placeholder="Type your message..." class="flex-1 px-3 py-2 bg-transparent focus:outline-none">
-                    <button id="send-button" onclick="sendMessage()" class="bg-blue-500 hover:bg-blue-600 text-white rounded-lg p-2 ml-2">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg>
+                    <button onclick="startStudy('explore')" class="w-full bg-slate-200 hover:bg-slate-300 text-slate-800 font-semibold py-3 px-4 rounded-xl transition-transform transform hover:scale-105 flex items-center justify-center">
+                        Explore a Topic or Ask a Question
+                    </button>
+
+                    <button onclick="startStudy('children')" class="w-full bg-orange-500 hover:bg-orange-600 text-white font-semibold py-3 px-4 rounded-xl shadow-md transition-transform transform hover:scale-105 flex items-center justify-center">
+                        Enter Children's Section
                     </button>
                 </div>
             </div>
-        </div>
 
+            <!-- Chat Screen -->
+            <div id="chat-screen" class="absolute inset-0 hidden flex flex-col h-full">
+                <!-- Messages Area -->
+                <div id="chat-messages" class="flex-1 p-6 overflow-y-auto space-y-6">
+                    <!-- Messages will be injected here by JavaScript -->
+                </div>
+
+                <!-- Input Area -->
+                <div class="p-4 bg-slate-50 border-t flex-shrink-0">
+                    <div class="flex items-center bg-white rounded-xl border p-1">
+                        <input type="text" id="chat-input" placeholder="Type your message..." class="flex-1 px-3 py-2 bg-transparent focus:outline-none">
+                        <button id="send-button" onclick="sendMessage()" class="bg-blue-500 hover:bg-blue-600 text-white rounded-lg p-2 ml-2">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
 
     <script>
@@ -111,44 +113,43 @@
         const chatScreen = document.getElementById('chat-screen');
         const chatMessages = document.getElementById('chat-messages');
         const chatInput = document.getElementById('chat-input');
-        const chatHeader = document.getElementById('chat-header');
         const sendButton = document.getElementById('send-button');
-
-        // The system prompt is now stored securely in the serverless function.
+        // New elements for the persistent header
+        const backButton = document.getElementById('back-button');
+        const headerTitle = document.getElementById('header-title');
         
         function startStudy(type) {
             welcomeScreen.classList.add('hidden');
             chatScreen.classList.remove('hidden');
-            chatScreen.classList.add('flex');
             chatMessages.innerHTML = '';
             
             let welcomeMessage = '';
-            let headerTitle = 'Bible Study Assistant';
+            let newTitle = 'Bible Study Assistant';
 
             switch (type) {
                 case 'course':
                     welcomeMessage = "That's wonderful that you're interested in the Bible course! I can guide you through the 'Enjoy Life Forever!' study guide. Are you ready to begin with the first lesson?";
-                    headerTitle = 'Interactive Course';
-                    addAssistantMessage(welcomeMessage);
+                    newTitle = 'Interactive Course';
                     break;
                 case 'explore':
                     welcomeMessage = "I'm here to help you explore any Bible topic you have in mind. What would you like to learn about today? You could ask about a person, a place, a Bible book, or a specific teaching.";
-                    headerTitle = 'Explore a Topic';
-                    addAssistantMessage(welcomeMessage);
+                    newTitle = 'Explore a Topic';
                     break;
                 case 'children':
                     welcomeMessage = "Hello, friend! Welcome to the children's section. Would you like to watch a video, sing a song, or do a fun activity today?";
-                    headerTitle = "Children's Section";
-                    addAssistantMessage(welcomeMessage);
+                    newTitle = "Children's Section";
                     break;
             }
-            chatHeader.textContent = headerTitle;
+            headerTitle.textContent = newTitle;
+            backButton.classList.remove('hidden');
+            addAssistantMessage(welcomeMessage);
         }
 
         function goBack() {
             chatScreen.classList.add('hidden');
-            chatScreen.classList.remove('flex');
             welcomeScreen.classList.remove('hidden');
+            backButton.classList.add('hidden');
+            headerTitle.textContent = 'Bible Study Assistant';
         }
 
         function setTyping(isTyping) {
@@ -262,5 +263,4 @@
 
 </body>
 </html>
-
 
