@@ -50,9 +50,10 @@
         }
     </style>
 </head>
-<body class="bg-slate-100 text-slate-800 flex items-center justify-center min-h-screen">
+<body class="bg-slate-100 text-slate-800 flex items-center justify-center min-h-screen p-4">
 
-    <div id="app-container" class="w-full max-w-md mx-auto bg-white rounded-2xl shadow-2xl h-[80vh] flex flex-col transition-all duration-500">
+    <!-- App container is now wider on larger screens -->
+    <div id="app-container" class="w-full max-w-md md:max-w-2xl lg:max-w-4xl mx-auto bg-white rounded-2xl shadow-2xl h-[90vh] flex flex-col transition-all duration-500">
 
         <!-- Welcome Screen -->
         <div id="welcome-screen" class="flex flex-col items-center justify-center text-center p-8 h-full">
@@ -62,104 +63,16 @@
             <h1 class="text-3xl font-bold text-slate-900 mb-2">Bible Study Assistant</h1>
             <p class="text-slate-500 mb-8">A friendly guide for your personal study.</p>
             
-            <div class="space-y-4 w-full">
+            <div class="space-y-4 w-full max-w-sm">
                 <button onclick="startStudy('course')" class="w-full bg-blue-500 hover:bg-blue-600 text-white font-semibold py-3 px-4 rounded-xl shadow-md transition-transform transform hover:scale-105 flex items-center justify-center">
-                    <span class="mr-3">
-                        <!-- Two people studying SVG -->
-                        <svg width="50" height="50" viewBox="0 0 120 120">
-                            <defs>
-                                <clipPath id="circleClip1"><circle cx="40" cy="35" r="18"/></clipPath>
-                                <clipPath id="circleClip2"><circle cx="80" cy="45" r="18"/></clipPath>
-                            </defs>
-                            <!-- Table -->
-                            <rect x="10" y="90" width="100" height="15" fill="#A0522D" rx="5"/>
-                            <!-- Person 1 (Tutor) -->
-                            <rect x="22" y="50" width="36" height="40" fill="#2F4F4F" rx="10"/>
-                            <circle cx="40" cy="35" r="18" fill="#F5DEB3"/>
-                            <g clip-path="url(#circleClip1)">
-                                <path d="M30,25 Q40,20 50,25" stroke="#444" stroke-width="3" fill="none"/>
-                                <circle cx="34" cy="35" r="2" fill="#333"/>
-                                <circle cx="46" cy="35" r="2" fill="#333"/>
-                                <path d="M38,42 Q40,45 42,42" stroke="#333" stroke-width="2" fill="none"/>
-                            </g>
-                            <!-- Person 2 (Student) -->
-                            <rect x="62" y="60" width="36" height="30" fill="#4682B4" rx="10"/>
-                            <circle cx="80" cy="45" r="18" fill="#A0522D"/>
-                             <g clip-path="url(#circleClip2)">
-                                <path d="M70,35 Q80,30 90,35" stroke="#222" stroke-width="3" fill="none"/>
-                                <circle cx="74" cy="45" r="2" fill="#000"/>
-                                <circle cx="86" cy="45" r="2" fill="#000"/>
-                                <path d="M78,52 Q80,56 82,52" stroke="#000" stroke-width="2" fill="none"/>
-                            </g>
-                             <!-- Book -->
-                            <path d="M50,80 L70,75 L75,90 L55,95 Z" fill="#FFFFFF" stroke="#DDD" stroke-width="2"/>
-                            <path d="M70,75 L90,80 L85,95 L65,90 Z" fill="#FFFFFF" stroke="#DDD" stroke-width="2"/>
-                        </svg>
-                    </span>
                     Start the Interactive Bible Course
                 </button>
 
                 <button onclick="startStudy('explore')" class="w-full bg-slate-200 hover:bg-slate-300 text-slate-800 font-semibold py-3 px-4 rounded-xl transition-transform transform hover:scale-105 flex items-center justify-center">
-                    <span class="mr-3">
-                        <!-- Couple SVG -->
-                        <svg width="50" height="50" viewBox="0 0 120 120">
-                            <defs>
-                                <clipPath id="circleClip3"><circle cx="45" cy="40" r="15"/></clipPath>
-                                <clipPath id="circleClip4"><circle cx="75" cy="40" r="15"/></clipPath>
-                            </defs>
-                            <!-- Woman -->
-                            <rect x="60" y="55" width="30" height="45" fill="#800080" rx="10"/>
-                            <circle cx="75" cy="40" r="15" fill="#D2B48C"/>
-                             <g clip-path="url(#circleClip4)">
-                                <path d="M65,30 Q85,25 85,35" stroke="#333" stroke-width="3" fill="none"/>
-                                <circle cx="70" cy="40" r="2" fill="#222"/>
-                                <circle cx="80" cy="40" r="2" fill="#222"/>
-                                <path d="M72,48 Q75,52 78,48" stroke="#222" stroke-width="2" fill="none"/>
-                            </g>
-                            <!-- Man -->
-                            <rect x="30" y="55" width="30" height="55" fill="#2F4F4F" rx="10"/>
-                            <path d="M42,55 L45,65 L48,55 Z" fill="#FFF"/>
-                            <circle cx="45" cy="40" r="15" fill="#8B4513"/>
-                            <g clip-path="url(#circleClip3)">
-                                <path d="M38,30 Q45,28 52,30" stroke="#111" stroke-width="3" fill="none"/>
-                                <circle cx="40" cy="40" r="2" fill="#000"/>
-                                <circle cx="50" cy="40" r="2" fill="#000"/>
-                                <path d="M42,48 Q45,52 48,48" stroke="#000" stroke-width="2" fill="none"/>
-                            </g>
-                        </svg>
-                    </span>
                     Explore a Topic or Ask a Question
                 </button>
 
                 <button onclick="startStudy('children')" class="w-full bg-orange-500 hover:bg-orange-600 text-white font-semibold py-3 px-4 rounded-xl shadow-md transition-transform transform hover:scale-105 flex items-center justify-center">
-                    <span class="mr-3">
-                        <!-- Two happy children SVG -->
-                        <svg width="50" height="50" viewBox="0 0 120 120">
-                            <defs>
-                                <clipPath id="circleClip5"><circle cx="40" cy="45" r="15"/></clipPath>
-                                <clipPath id="circleClip6"><circle cx="80" cy="45" r="15"/></clipPath>
-                            </defs>
-                             <!-- Girl -->
-                            <rect x="65" y="60" width="30" height="40" fill="#FF69B4" rx="10"/>
-                            <circle cx="80" cy="45" r="15" fill="#A0522D"/>
-                            <g clip-path="url(#circleClip6)">
-                                <path d="M70,35 Q75,32 80,35" stroke="#222" stroke-width="3" fill="none"/>
-                                <path d="M80,35 Q85,32 90,35" stroke="#222" stroke-width="3" fill="none"/>
-                                <circle cx="75" cy="45" r="2.5" fill="#000"/>
-                                <circle cx="85" cy="45" r="2.5" fill="#000"/>
-                                <path d="M77,53 Q80,58 83,53" stroke="#000" stroke-width="2" fill="none"/>
-                            </g>
-                            <!-- Boy -->
-                            <rect x="25" y="60" width="30" height="40" fill="#32CD32" rx="10"/>
-                            <circle cx="40" cy="45" r="15" fill="#FFDAB9"/>
-                            <g clip-path="url(#circleClip5)">
-                                <path d="M30,35 Q40,30 50,35" stroke="#A0522D" stroke-width="3" fill="none"/>
-                                <circle cx="35" cy="45" r="2.5" fill="#333"/>
-                                <circle cx="45" cy="45" r="2.5" fill="#333"/>
-                                <path d="M37,53 Q40,58 43,53" stroke="#333" stroke-width="2" fill="none"/>
-                            </g>
-                        </svg>
-                    </span>
                     Enter Children's Section
                 </button>
             </div>
@@ -308,15 +221,12 @@
         async function getLLMResponse(userMessage) {
             setTyping(true);
             
-            // The API URL now points to our new, secure serverless function.
-            // When deployed, the browser knows how to find this function at this path.
             const apiUrl = '/.netlify/functions/get-response';
 
             try {
                 const response = await fetch(apiUrl, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    // We just need to send the user's message.
                     body: JSON.stringify({ userMessage: userMessage })
                 });
 
@@ -324,7 +234,6 @@
                     throw new Error(`Serverless function failed with status: ${response.status}`);
                 }
 
-                // The serverless function sends back the data in the same format we need.
                 const result = await response.json();
                 
                 addAssistantMessage(result.text, result.sources);
@@ -353,4 +262,5 @@
 
 </body>
 </html>
+
 
