@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Bible Study Assistant - Prototype</title>
+    <title>Bible Study Assistant</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -26,7 +26,7 @@
         ::-webkit-scrollbar-thumb:hover {
             background: #64748b;
         }
-        .assistant-bubble, .user-bubble {
+        .assistant-bubble, .user-bubble, .suggestion-chip {
             animation: fadeIn 0.5s ease-in-out;
         }
         @keyframes fadeIn {
@@ -58,7 +58,7 @@
         <!-- ===== PERSISTENT HEADER ===== -->
         <div class="flex items-center p-4 border-b bg-slate-50 rounded-t-2xl flex-shrink-0">
             <button id="back-button" onclick="goBack()" class="hidden mr-3 text-slate-500 hover:text-slate-800">
-                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>
             </button>
             <h2 id="header-title" class="text-xl font-bold text-slate-900">Bible Study Assistant</h2>
         </div>
@@ -95,8 +95,15 @@
                     <!-- Messages will be injected here by JavaScript -->
                 </div>
 
+                <!-- ===== SUGGESTIONS AREA ===== -->
+                <div id="suggestions-area" class="p-2 pt-0 border-t bg-slate-50 flex-shrink-0">
+                     <div id="suggestions-container" class="flex gap-2 overflow-x-auto pb-2">
+                        <!-- Suggestion chips will be injected here -->
+                    </div>
+                </div>
+
                 <!-- Input Area -->
-                <div class="p-4 bg-slate-50 border-t flex-shrink-0">
+                <div class="p-4 pt-2 bg-slate-50 flex-shrink-0">
                     <div class="flex items-center bg-white rounded-xl border p-1">
                         <input type="text" id="chat-input" placeholder="Type your message..." class="flex-1 px-3 py-2 bg-transparent focus:outline-none">
                         <button id="send-button" onclick="sendMessage()" class="bg-blue-500 hover:bg-blue-600 text-white rounded-lg p-2 ml-2">
@@ -114,9 +121,10 @@
         const chatMessages = document.getElementById('chat-messages');
         const chatInput = document.getElementById('chat-input');
         const sendButton = document.getElementById('send-button');
-        // New elements for the persistent header
         const backButton = document.getElementById('back-button');
         const headerTitle = document.getElementById('header-title');
+        const suggestionsArea = document.getElementById('suggestions-area');
+        const suggestionsContainer = document.getElementById('suggestions-container');
         
         function startStudy(type) {
             welcomeScreen.classList.add('hidden');
@@ -125,24 +133,51 @@
             
             let welcomeMessage = '';
             let newTitle = 'Bible Study Assistant';
+            let suggestions = [];
 
             switch (type) {
                 case 'course':
-                    welcomeMessage = "That's wonderful that you're interested in the Bible course! I can guide you through the 'Enjoy Life Forever!' study guide. Are you ready to begin with the first lesson?";
+                    welcomeMessage = "That's wonderful that you're interested in the Bible course! I can guide you through the 'Enjoy Life Forever!' study guide. You can start with the first lesson or ask about a specific part.";
                     newTitle = 'Interactive Course';
+                    suggestions = ["Start Lesson 1", "What is the course about?", "How long does it take?"];
                     break;
                 case 'explore':
-                    welcomeMessage = "I'm here to help you explore any Bible topic you have in mind. What would you like to learn about today? You could ask about a person, a place, a Bible book, or a specific teaching.";
+                    welcomeMessage = "I'm here to help you explore any Bible topic you have in mind. You can ask me anything or choose one of the topics below to get started.";
                     newTitle = 'Explore a Topic';
+                    suggestions = ["Who is Jehovah?", "What is God's Kingdom?", "Why does God allow suffering?"];
                     break;
                 case 'children':
-                    welcomeMessage = "Hello, friend! Welcome to the children's section. Would you like to watch a video, sing a song, or do a fun activity today?";
+                    welcomeMessage = "Hello, friend! Welcome to the children's section. What would you like to do today?";
                     newTitle = "Children's Section";
+                    suggestions = ["Watch a video", "Sing a song", "Do a fun activity"];
                     break;
             }
             headerTitle.textContent = newTitle;
             backButton.classList.remove('hidden');
             addAssistantMessage(welcomeMessage);
+            loadSuggestions(suggestions);
+        }
+
+        function loadSuggestions(suggestions) {
+            suggestionsContainer.innerHTML = '';
+            if (suggestions.length > 0) {
+                suggestions.forEach(text => {
+                    const button = document.createElement('button');
+                    button.textContent = text;
+                    button.className = "suggestion-chip bg-blue-100 text-blue-800 font-semibold py-2 px-4 rounded-full whitespace-nowrap hover:bg-blue-200 transition-colors";
+                    button.onclick = () => sendSuggestion(text);
+                    suggestionsContainer.appendChild(button);
+                });
+                suggestionsArea.classList.remove('hidden');
+            } else {
+                suggestionsArea.classList.add('hidden');
+            }
+        }
+
+        function sendSuggestion(text) {
+            addUserMessage(text);
+            getLLMResponse(text);
+            suggestionsArea.classList.add('hidden');
         }
 
         function goBack() {
@@ -150,6 +185,7 @@
             welcomeScreen.classList.remove('hidden');
             backButton.classList.add('hidden');
             headerTitle.textContent = 'Bible Study Assistant';
+            suggestionsArea.classList.add('hidden');
         }
 
         function setTyping(isTyping) {
@@ -222,6 +258,11 @@
         async function getLLMResponse(userMessage) {
             setTyping(true);
             
+            if (window.location.protocol === 'file:') {
+                addAssistantMessage("The assistant's interactive features are only available on the live online version. Please use the version deployed on Netlify to chat.");
+                return;
+            }
+            
             const apiUrl = '/.netlify/functions/get-response';
 
             try {
@@ -231,17 +272,19 @@
                     body: JSON.stringify({ userMessage: userMessage })
                 });
 
-                if (!response.ok) {
-                    throw new Error(`Serverless function failed with status: ${response.status}`);
-                }
-
                 const result = await response.json();
+
+                if (!response.ok) {
+                    // Use the specific error from the backend if it exists
+                    throw new Error(result.error || `Serverless function failed with status: ${response.status}`);
+                }
                 
                 addAssistantMessage(result.text, result.sources);
 
             } catch (error) {
                 console.error("Error fetching LLM response:", error);
-                addAssistantMessage("I'm having a little trouble connecting right now. Please try again in a moment.");
+                // Display the specific error message from the backend now
+                addAssistantMessage(`I'm having trouble connecting. Here's the technical detail: ${error.message}`);
             }
         }
 
@@ -251,6 +294,7 @@
                 addUserMessage(message);
                 chatInput.value = '';
                 getLLMResponse(message);
+                suggestionsArea.classList.add('hidden');
             }
         }
 
@@ -263,4 +307,6 @@
 
 </body>
 </html>
+
+
 
