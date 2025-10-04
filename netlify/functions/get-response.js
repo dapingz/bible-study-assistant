@@ -1,59 +1,63 @@
 const fetch = require('node-fetch');
 
-// This is your new "middleman" serverless function.
-// When you deploy this to a host like Netlify, it will run in a secure environment.
+// Using the URL constructor for a more robust URL creation
+const { URL } = require('url');
 
-// The system prompt is now stored here, on the backend, for security and consistency.
-const systemPrompt = `You are a Bible study assistant. Your persona is loving, humble, friendly, and patient. 
-Your teaching material is exclusively the content found on the official website jw.org. Your primary source for all scripture is the 'New World Translation of the Holy Scriptures (Study Edition)'.
-You must base all your answers, explanations, and principles on information from jw.org publications.
-You must NOT use information from any other website, religious publication, or external source.
-Crucially, when quoting any Bible verse, you MUST identify it as being from the 'New World Translation of the Holy Scriptures (Study Edition)'. You are not to quote from any other translation, even older versions that might be on jw.org.
-If a user brings up a topic or Bible verse not discussed on jw.org, do not reject it. Instead, tactfully use principles and information that are available on jw.org to guide the conversation and provide a helpful perspective.
-Use a step-by-step approach. After answering a question, encourage the user to ask more questions. Keep your answers concise and easy to understand.`;
-
-exports.handler = async function (event, context) {
-    // We only allow POST requests to this function
+exports.handler = async function(event, context) {
+    // Only allow POST requests
     if (event.httpMethod !== 'POST') {
         return { statusCode: 405, body: 'Method Not Allowed' };
     }
 
     try {
-        const { userMessage } = JSON.parse(event.body);
-        if (!userMessage) {
-            return { statusCode: 400, body: 'Bad Request: Missing userMessage' };
-        }
+        console.log("Function invoked.");
         
-        // IMPORTANT: You must set your API key as an environment variable in your hosting provider's settings.
-        // For Netlify, this is found in Site settings > Build & deploy > Environment > Environment variables.
-        // Name the variable 'GEMINI_API_KEY'.
+        const { userMessage } = JSON.parse(event.body);
         const apiKey = process.env.GEMINI_API_KEY;
-        if (!apiKey) {
-            throw new Error('GEMINI_API_KEY is not set in environment variables.');
-        }
-        const apiUrl = `https://generativelogin.googleapis.com/v1beta/models/gemini-2.5-flash-preview-05-20:generateContent?key=${apiKey}`;
 
-        const groundedQuery = `site:jw.org ${userMessage}`;
+        if (!apiKey) {
+            console.error("CRITICAL: GEMINI_API_KEY environment variable not found.");
+            return {
+                statusCode: 500,
+                body: JSON.stringify({ error: 'Server configuration error: Missing API key.' }),
+            };
+        }
+        console.log("API Key was found successfully.");
+
+        // Construct the URL in a more robust way
+        const baseUrl = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-05-20:generateContent';
+        const apiUrl = new URL(baseUrl);
+        apiUrl.searchParams.append('key', apiKey);
+
+
+        const systemPrompt = `You are a loving, humble, friendly, and patient Bible study assistant. Your teaching material is all content on jw.org, including the online New World Translation of the Holy Scriptures (Study Edition) and other publications by Jehovah's Witnesses. You have two types of learners: experienced Jehovah's Witnesses and new learners. For experienced ones, apply principles to strengthen their faith. For new learners, guide and encourage them.
+
+        Core Instructions:
+        1.  **Exclusive Source:** Base ALL teachings, answers, and explanations STRICTLY on content from the jw.org website and official publications of Jehovah's Witnesses. Do not use any outside information.
+        2.  **Primary Bible Version:** When quoting scripture, you MUST use the "New World Translation of the Holy Scriptures (Study Edition)". Explicitly mention this version when you quote it. Strictly ignore all other translations.
+        3.  **Tone:** Always maintain a loving, humble, friendly, and patient tone.
+        4.  **Guidance:** Use a step-by-step approach. Patiently answer questions and then encourage further questions.
+        5.  **External Topics:** If a user brings up a topic not covered in JW publications, tactfully guide the conversation back to the information that is available on jw.org.
+        6.  **Conclusion:** After answering, briefly summarize the topic and encourage them to ask more. You may also suggest relevant short videos from jw.org.`;
 
         const payload = {
-            contents: [{ parts: [{ text: groundedQuery }] }],
-            tools: [{ "google_search": {} }],
-            systemInstruction: {
-                parts: [{ text: systemPrompt }]
-            },
+            contents: [{ parts: [{ text: userMessage }] }],
+            tools: [{ "google_search": { "restricted_search": { "uris": ["jw.org"] } } }],
+            systemInstruction: { parts: [{ text: systemPrompt }] },
         };
-
-        const response = await fetch(apiUrl, {
+        
+        console.log("Sending request to Gemini API at:", apiUrl.toString());
+        const response = await fetch(apiUrl.toString(), {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(payload)
+            body: JSON.stringify(payload),
         });
 
+        console.log("Received response from Gemini API with status:", response.status);
         if (!response.ok) {
-            console.error(`API call failed with status: ${response.status}`);
             const errorBody = await response.text();
-            console.error(`Error body: ${errorBody}`);
-            return { statusCode: response.status, body: 'Error from Gemini API' };
+            console.error('Gemini API Error:', errorBody);
+            throw new Error(`API call failed with status: ${response.status}`);
         }
 
         const result = await response.json();
@@ -63,33 +67,24 @@ exports.handler = async function (event, context) {
             const text = candidate.content.parts[0].text;
             let sources = [];
             const groundingMetadata = candidate.groundingMetadata;
-
             if (groundingMetadata && groundingMetadata.groundingAttributions) {
                 sources = groundingMetadata.groundingAttributions
-                    .map(attribution => ({
-                        uri: attribution.web?.uri,
-                        title: attribution.web?.title,
-                    }))
-                    .filter(source => source.uri);
+                    .map(att => ({ uri: att.web?.uri, title: att.web?.title }))
+                    .filter(source => source.uri && source.title);
             }
-            
             return {
                 statusCode: 200,
-                body: JSON.stringify({ text, sources })
+                body: JSON.stringify({ text, sources }),
             };
-
         } else {
-             return {
-                statusCode: 200,
-                body: JSON.stringify({ text: "I'm sorry, I couldn't find a specific answer on jw.org for that. Could you try asking in a different way?", sources: [] })
-            };
+            throw new Error("Invalid response structure from API.");
         }
 
     } catch (error) {
-        console.error("Error in serverless function:", error);
+        console.error("An error occurred in the function:", error);
         return {
             statusCode: 500,
-            body: JSON.stringify({ text: "I'm having a little trouble connecting right now. Please try again in a moment.", sources: [] })
+            body: JSON.stringify({ error: error.message }),
         };
     }
 };
