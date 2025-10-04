@@ -1,7 +1,4 @@
 {
-  "name": "bible-study-assistant-functions",
-  "version": "1.0.0",
-  "description": "Dependencies for the serverless function.",
   "dependencies": {
     "node-fetch": "^2.6.7"
   }
