@@ -1,34 +1,27 @@
 const fetch = require('node-fetch');
-
-// Using the URL constructor for a more robust URL creation
 const { URL } = require('url');
 
 exports.handler = async function(event, context) {
-    // Only allow POST requests
     if (event.httpMethod !== 'POST') {
-        return { statusCode: 405, body: 'Method Not Allowed' };
+        return { statusCode: 405, body: JSON.stringify({ error: 'Method Not Allowed' }) };
     }
 
     try {
-        console.log("Function invoked.");
-        
         const { userMessage } = JSON.parse(event.body);
         const apiKey = process.env.GEMINI_API_KEY;
 
         if (!apiKey) {
             console.error("CRITICAL: GEMINI_API_KEY environment variable not found.");
+            // Return a specific error message
             return {
                 statusCode: 500,
-                body: JSON.stringify({ error: 'Server configuration error: Missing API key.' }),
+                body: JSON.stringify({ error: 'Server configuration error: The API key is missing. Please check Netlify environment variables.' }),
             };
         }
-        console.log("API Key was found successfully.");
 
-        // Construct the URL in a more robust way
         const baseUrl = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-05-20:generateContent';
         const apiUrl = new URL(baseUrl);
         apiUrl.searchParams.append('key', apiKey);
-
 
         const systemPrompt = `You are a loving, humble, friendly, and patient Bible study assistant. Your teaching material is all content on jw.org, including the online New World Translation of the Holy Scriptures (Study Edition) and other publications by Jehovah's Witnesses. You have two types of learners: experienced Jehovah's Witnesses and new learners. For experienced ones, apply principles to strengthen their faith. For new learners, guide and encourage them.
 
@@ -46,18 +39,20 @@ exports.handler = async function(event, context) {
             systemInstruction: { parts: [{ text: systemPrompt }] },
         };
         
-        console.log("Sending request to Gemini API at:", apiUrl.toString());
         const response = await fetch(apiUrl.toString(), {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(payload),
         });
 
-        console.log("Received response from Gemini API with status:", response.status);
         if (!response.ok) {
             const errorBody = await response.text();
             console.error('Gemini API Error:', errorBody);
-            throw new Error(`API call failed with status: ${response.status}`);
+            // Return a specific error message
+            return {
+                statusCode: response.status,
+                body: JSON.stringify({ error: `The call to the Gemini API failed. Status: ${response.status}. Please check the API key and Google Cloud project settings.` }),
+            };
         }
 
         const result = await response.json();
@@ -77,14 +72,17 @@ exports.handler = async function(event, context) {
                 body: JSON.stringify({ text, sources }),
             };
         } else {
-            throw new Error("Invalid response structure from API.");
+             return {
+                statusCode: 500,
+                body: JSON.stringify({ error: "The response from the Gemini API was invalid or empty." }),
+            };
         }
 
     } catch (error) {
         console.error("An error occurred in the function:", error);
         return {
             statusCode: 500,
-            body: JSON.stringify({ error: error.message }),
+            body: JSON.stringify({ error: `A critical error occurred in the serverless function: ${error.message}` }),
         };
     }
 };
