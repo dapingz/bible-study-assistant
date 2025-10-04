@@ -35,7 +35,8 @@ exports.handler = async function(event, context) {
 
         const payload = {
             contents: [{ parts: [{ text: userMessage }] }],
-            tools: [{ "google_search": { "restricted_search": { "uris": ["jw.org"] } } }],
+            // The 'tools' property is temporarily removed to resolve the 400 Bad Request error.
+            // The system prompt still strictly enforces the use of jw.org.
             systemInstruction: { parts: [{ text: systemPrompt }] },
         };
         
