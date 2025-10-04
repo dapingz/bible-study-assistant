@@ -1,5 +1,8 @@
 const fetch = require('node-fetch');
 
+// Using the URL constructor for a more robust URL creation
+const { URL } = require('url');
+
 exports.handler = async function(event, context) {
     // Only allow POST requests
     if (event.httpMethod !== 'POST') {
@@ -7,7 +10,7 @@ exports.handler = async function(event, context) {
     }
 
     try {
-        console.log("Function invoked. Event body:", event.body); // Log the incoming request
+        console.log("Function invoked.");
         
         const { userMessage } = JSON.parse(event.body);
         const apiKey = process.env.GEMINI_API_KEY;
@@ -21,9 +24,21 @@ exports.handler = async function(event, context) {
         }
         console.log("API Key was found successfully.");
 
-        const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-05-20:generateContent?key=${apiKey}`;
+        // Construct the URL in a more robust way
+        const baseUrl = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-05-20:generateContent';
+        const apiUrl = new URL(baseUrl);
+        apiUrl.searchParams.append('key', apiKey);
 
-        const systemPrompt = "You are a loving, humble, friendly, and patient Bible study assistant... [rest of prompt]"; // Abridged for clarity
+
+        const systemPrompt = `You are a loving, humble, friendly, and patient Bible study assistant. Your teaching material is all content on jw.org, including the online New World Translation of the Holy Scriptures (Study Edition) and other publications by Jehovah's Witnesses. You have two types of learners: experienced Jehovah's Witnesses and new learners. For experienced ones, apply principles to strengthen their faith. For new learners, guide and encourage them.
+
+        Core Instructions:
+        1.  **Exclusive Source:** Base ALL teachings, answers, and explanations STRICTLY on content from the jw.org website and official publications of Jehovah's Witnesses. Do not use any outside information.
+        2.  **Primary Bible Version:** When quoting scripture, you MUST use the "New World Translation of the Holy Scriptures (Study Edition)". Explicitly mention this version when you quote it. Strictly ignore all other translations.
+        3.  **Tone:** Always maintain a loving, humble, friendly, and patient tone.
+        4.  **Guidance:** Use a step-by-step approach. Patiently answer questions and then encourage further questions.
+        5.  **External Topics:** If a user brings up a topic not covered in JW publications, tactfully guide the conversation back to the information that is available on jw.org.
+        6.  **Conclusion:** After answering, briefly summarize the topic and encourage them to ask more. You may also suggest relevant short videos from jw.org.`;
 
         const payload = {
             contents: [{ parts: [{ text: userMessage }] }],
@@ -31,8 +46,8 @@ exports.handler = async function(event, context) {
             systemInstruction: { parts: [{ text: systemPrompt }] },
         };
         
-        console.log("Sending request to Gemini API...");
-        const response = await fetch(apiUrl, {
+        console.log("Sending request to Gemini API at:", apiUrl.toString());
+        const response = await fetch(apiUrl.toString(), {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(payload),
